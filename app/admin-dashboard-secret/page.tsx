@@ -103,7 +103,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total em Presentes</CardTitle>
               <Gift className="h-4 w-4 text-gray-600" />
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">R$ {totalGiftValue}</div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
           </Card>
 
           {/* Gift Messages */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Presentes e Mensagens</CardTitle>
               <CardDescription>Mensagens carinhosas dos convidados</CardDescription>
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
     </div>
