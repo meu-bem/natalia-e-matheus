@@ -68,7 +68,7 @@ export default function AdminDashboard() {
             <Heart className="h-8 w-8 text-gray-600 mr-2" />
             <h1 className="text-3xl font-bold text-gray-800">Dashboard do Casamento</h1>
           </div>
-          <p className="text-gray-600">Natália & Matheus - 15 de Junho, 2024</p>
+          <p className="text-gray-600">Natália & Matheus - 8 de novembro, 2025</p>
         </div>
 
         {/* Stats Cards */}

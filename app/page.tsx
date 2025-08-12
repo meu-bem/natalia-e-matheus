@@ -92,11 +92,14 @@ export default function WeddingInvitation() {
   const [customValue, setCustomValue] = useState("")
   const [giftMessage, setGiftMessage] = useState("")
   const [tempName, setTempName] = useState("")
-
+  
   // Storage states
   const [hasConfirmed, setHasConfirmed] = useState(false)
   const [hasSentMessage, setHasSentMessage] = useState(false)
   const [storedGuestName, setStoredGuestName] = useState("")
+  
+  //Payment
+  const [pixPayload, setPixPayload] = useState('')
 
   useEffect(() => {
     // Check localStorage on mount
@@ -127,11 +130,17 @@ export default function WeddingInvitation() {
 
     try {
       // Send to spreadsheet
-      await fetch("/api/save-response", {
+      await fetch("https://script.google.com/macros/s/AKfycbweGwCCeIHR1YwuhwLqn-Rw6agKL4O8OZeuuALNq04ecXEBNZ4ySL0g-GdKVbM9OxdI/exec", {
+        redirect: "follow",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(response),
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        }
       })
+      .then(response => response.json())
+      .then(data => console.log("Resposta:", data))
+      .catch(error => console.error("Erro:", error));
 
       // Save to localStorage
       localStorage.setItem("wedding_confirmed", "true")
@@ -221,10 +230,10 @@ export default function WeddingInvitation() {
     }
   }
 
-  const pixKey = "natalia.matheus@casamento.com"
+  const pixKey = "nataliamendonsa662@gmail.com"
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-[url(/paper-texture.jpg)]">
       <div className="container mx-auto px-4 py-8 max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -233,8 +242,7 @@ export default function WeddingInvitation() {
 
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              <Heart className="h-5 w-5 text-gray-600 mr-2" />
-              <span className="text-lg font-semibold text-gray-800">15 de Junho, 2024</span>
+              <span className="text-lg font-semibold text-gray-800">8 de novembro, 2025</span>
             </div>
             <p className="text-gray-600 mb-2">às 16:00h</p>
             <div className="flex items-center justify-center">
@@ -283,13 +291,16 @@ export default function WeddingInvitation() {
                       onClick={() => setAttendance("no")}
                       className={`p-4 rounded-lg border-2 transition-all text-center ${
                         attendance === "no"
-                          ? "bg-gray-100 border-gray-300 shadow-md"
+                          ? "bg-gray-800 border-gray-800 text-white shadow-md"
                           : "bg-white border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <div className="text-2xl mb-2">😔</div>
-                      <div className="font-semibold text-gray-800 mb-1">Não poderei ir</div>
-                      <div className="text-sm text-gray-600">Infelizmente não conseguirei comparecer</div>
+                      <div className={`font-semibold mb-1 ${attendance === "no" ? "text-white" : "text-gray-800"}`}>
+                        Não poderei ir
+                      </div>
+                      <div className={`text-sm ${attendance === "no" ? "text-gray-200" : "text-gray-600"}`}>
+                        Infelizmente não conseguirei comparecer
+                      </div>
                     </button>
 
                     <button
@@ -301,7 +312,6 @@ export default function WeddingInvitation() {
                           : "bg-white border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <div className="text-2xl mb-2">🎉</div>
                       <div className={`font-semibold mb-1 ${attendance === "yes" ? "text-white" : "text-gray-800"}`}>
                         Estarei presente
                       </div>
@@ -320,8 +330,8 @@ export default function WeddingInvitation() {
                       }`}
                     >
                       {attendance === "yes"
-                        ? "Que alegria! Ficamos muito felizes em saber que você estará conosco! 🎉"
-                        : "Sentimos muito, mas entendemos perfeitamente. Obrigado por nos avisar! 😔"}
+                        ? "Que alegria! Ficamos muito felizes em saber que você estará conosco!"
+                        : "Sentimos muito, mas entendemos perfeitamente. Obrigado por nos avisar!"}
                     </div>
                   )}
                 </div>
@@ -387,17 +397,18 @@ export default function WeddingInvitation() {
                           pixKey={pixKey}
                           value={selectedGift.id === 6 ? Number.parseInt(customValue) || 0 : selectedGift.value}
                           description={selectedGift.title}
+                          setPixPayload={setPixPayload}
                         />
                         <p className="text-sm text-gray-600 mb-3 mt-2">
                           Valor: R$ {selectedGift.id === 6 ? customValue || "0" : selectedGift.value}
                         </p>
                         <div className="flex items-center justify-between bg-gray-100 p-2 rounded text-sm">
-                          <span className="font-mono truncate">{pixKey}</span>
+                          <span className="font-mono truncate">{pixPayload}</span>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              navigator.clipboard.writeText(pixKey)
+                              navigator.clipboard.writeText(pixPayload)
                               toast({ title: "Chave PIX copiada!" })
                             }}
                           >
@@ -448,8 +459,7 @@ export default function WeddingInvitation() {
             {locationExpanded && (
               <div className="bg-white rounded-lg p-4 shadow-lg border border-gray-200">
                 <div className="w-full h-48 rounded-lg mb-4 overflow-hidden">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1975!2d-46.6333824!3d-23.5505199!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce5a2b2ed7f3a1%3A0x8adaaa3c2b4b4b4b!2sIgreja%20S%C3%A3o%20Jos%C3%A9!5e0!3m2!1spt!2sbr!4v1234567890"
+                  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5613.946143139309!2d-60.01756382609123!3d-3.0660744993271214!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1a7d33917857%3A0x2f933173e2d8023f!2sBELLA%20FLORA%20Casa%20de%20Festas!5e0!3m2!1spt-BR!2sbr!4v1754963098804!5m2!1spt-BR!2sbr"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -457,12 +467,13 @@ export default function WeddingInvitation() {
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   />
+
                 </div>
 
                 <Button
                   className="w-full bg-gray-600 hover:bg-gray-700"
                   onClick={() => {
-                    const destination = "Igreja São José, Centro"
+                    const destination = "Bella Flora Casa de Festas. R. Sergipe, 47 - flores, Manaus - AM"
                     window.open(
                       `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`,
                       "_blank",

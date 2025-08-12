@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { Dispatch, SetStateAction, useEffect, useRef } from "react"
 import { payload } from "pix-payload"
 import QRCode from "qrcode"
 
@@ -8,9 +8,10 @@ interface PixQRCodeProps {
   pixKey: string
   value: number
   description: string
+  setPixPayload: Dispatch<SetStateAction<string>>
 }
 
-export function PixQRCode({ pixKey, value, description }: PixQRCodeProps) {
+export function PixQRCode({ pixKey, value, description, setPixPayload }: PixQRCodeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -21,13 +22,15 @@ export function PixQRCode({ pixKey, value, description }: PixQRCodeProps) {
 
     const data = {
       key: pixKey,
-      name: "Mateus Santos Mendonca",
+      name: "Natalia Teixeira Mendonca",
       city: "SAO PAULO",
       amount: formattedValue,
-      transactionId: "PAY43VITRINE",
+      transactionId: "CAS4MENTO",
+      description: 'This is a description test!'
     }
 
     const pixPayload = payload(data)
+    setPixPayload(pixPayload)
 
     // Generate QR code
     QRCode.toCanvas(canvasRef.current, pixPayload, {
