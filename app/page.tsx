@@ -37,45 +37,57 @@ interface GiftMessage {
 const giftOptions = [
   {
     id: 1,
-    title: "Cafezinho dos Noivos",
-    value: 25,
-    description: "Para começar o dia com amor",
-    image: "/placeholder.svg?height=120&width=120&text=☕",
+    title: "Só pra dizer que não dei nada",
+    value: 200,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRuPYY-Q5V_55h2P5bua8my8e9A1qU5DHRjw&s",
   },
   {
     id: 2,
-    title: "Jantar Romântico",
-    value: 100,
-    description: "Uma noite especial a dois",
-    image: "/placeholder.svg?height=120&width=120&text=🍽️",
+    title: "Cooktop de última geração",
+    value: 250,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsQB6_4rEcy5az5PZHl34oqRtjnCmwnzSPfw&s",
   },
   {
     id: 3,
-    title: "Lua de Mel Básica",
-    value: 250,
-    description: "Ajuda com a viagem dos sonhos",
-    image: "/placeholder.svg?height=120&width=120&text=🌙",
+    title: "Taxa para a noiva jogar o buquê na sua direção",
+    value: 300,
+    image: "https://live.staticflickr.com/3569/3770416496_9fd49c0d83_b.jpg",
   },
   {
     id: 4,
-    title: "Lua de Mel Premium",
-    value: 500,
-    description: "Para uma viagem inesquecível",
-    image: "/placeholder.svg?height=120&width=120&text=✈️",
+    title: "Maquiagem da noiva",
+    value: 350,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsBF4tjIhg8P_TcMfln4iCGIotlhARuhABSQ&s",
   },
   {
     id: 5,
-    title: "Casa dos Sonhos",
-    value: 1000,
-    description: "Construindo o futuro juntos",
-    image: "/placeholder.svg?height=120&width=120&text=🏠",
+    title: "Prioridade na fila do buffet",
+    value: 400,
+    image: "https://letseat.com.br/uploads/8227904a26a0dea282186766e6a63cc2.jpg",
   },
   {
     id: 6,
-    title: "Presente Surpresa",
-    value: 0,
-    description: "Valor personalizado",
-    image: "/placeholder.svg?height=120&width=120&text=🎁",
+    title: "Ser o nosso convidado favorito",
+    value: 450,
+    image: "https://i.pinimg.com/736x/3f/78/2b/3f782bab2796dcf96f2c9cba48684658.jpg",
+  },
+  {
+    id: 7,
+    title: "Ajuda com os boletos do casamento",
+    value: 500,
+    image: "https://i.pinimg.com/564x/4e/3e/70/4e3e70f0d01a5f8134822cc108397256.jpg",
+  },
+  {
+    id: 8,
+    title: "Taxa para a noiva NÃO jogar o buquê para a sua namorada",
+    value: 550,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQysPX2gbw0Q2lumxVHFsq5UhULe05IHgWxDA&s",
+  },
+  {
+    id: 9,
+    title: "Levar alguém que não foi convidado",
+    value: 600,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFlRkChqkKytMuPqNeCsHIkhmyP2b4Niqavg&s",
   },
 ]
 
@@ -242,12 +254,15 @@ export default function WeddingInvitation() {
 
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
-              <span className="text-lg font-semibold text-gray-800">8 de novembro, 2025</span>
+              <span className="text-lg font-semibold text-[#696D40]">8 de novembro, 2025</span>
             </div>
-            <p className="text-gray-600 mb-2">às 16:00h</p>
+            <p className="text-[#696D40] mb-2">às 16:00h</p>
             <div className="flex items-center justify-center">
-              <MapPin className="h-4 w-4 text-gray-600 mr-1" />
-              <span className="text-sm text-gray-600">Igreja São José - Centro</span>
+              <MapPin className="h-4 w-4 text-[#696D40] mr-1" />
+              <span className="text-sm text-[#696D40]">Bella Flora Casa de Festas</span>
+            </div>
+            <div className="flex items-center justify-center">
+              <span className="text-sm text-[#696D40]">R. Sergipe, 47 - flores, Manaus - AM</span>
             </div>
           </div>
         </div>
@@ -258,7 +273,7 @@ export default function WeddingInvitation() {
           <Drawer open={confirmDrawerOpen} onOpenChange={setConfirmDrawerOpen}>
             <DrawerTrigger asChild>
               <Button
-                className="w-full h-14 text-lg bg-gray-800 hover:bg-gray-900 text-white shadow-lg"
+                className="w-full h-14 text-lg bg-[#696D40] hover:bg-[#A1A08E] text-white shadow-lg"
                 disabled={hasConfirmed}
               >
                 <Users className="mr-2 h-5 w-5" />
@@ -291,7 +306,7 @@ export default function WeddingInvitation() {
                       onClick={() => setAttendance("no")}
                       className={`p-4 rounded-lg border-2 transition-all text-center ${
                         attendance === "no"
-                          ? "bg-gray-800 border-gray-800 text-white shadow-md"
+                          ? "bg-[#696D40] border-gray-[#696D40] text-white shadow-md"
                           : "bg-white border-gray-200 hover:border-gray-300"
                       }`}
                     >
@@ -308,7 +323,7 @@ export default function WeddingInvitation() {
                       onClick={() => setAttendance("yes")}
                       className={`p-4 rounded-lg border-2 transition-all text-center ${
                         attendance === "yes"
-                          ? "bg-gray-800 border-gray-800 text-white shadow-md"
+                          ? "bg-[#696D40] border-gray-[#696D40] text-white shadow-md"
                           : "bg-white border-gray-200 hover:border-gray-300"
                       }`}
                     >
@@ -336,7 +351,7 @@ export default function WeddingInvitation() {
                   )}
                 </div>
 
-                <Button onClick={handleConfirmAttendance} className="w-full bg-gray-800 hover:bg-gray-900">
+                <Button onClick={handleConfirmAttendance} className="w-full bg-[#696D40] hover:bg-[#A1A08E]">
                   Enviar Confirmação
                 </Button>
               </div>
@@ -346,7 +361,7 @@ export default function WeddingInvitation() {
           {/* Gift the Couple */}
           <Drawer open={giftDrawerOpen} onOpenChange={setGiftDrawerOpen}>
             <DrawerTrigger asChild>
-              <Button className="w-full h-14 text-lg bg-gray-700 hover:bg-gray-800 text-white shadow-lg">
+              <Button className="w-full h-14 text-lg bg-[#696D40] hover:bg-[#A1A08E] text-white shadow-lg">
                 <Gift className="mr-2 h-5 w-5" />
                 Presentear os Noivos
               </Button>
@@ -363,14 +378,15 @@ export default function WeddingInvitation() {
                       <Card
                         key={gift.id}
                         className={`cursor-pointer transition-all aspect-square ${
-                          selectedGift?.id === gift.id ? "ring-2 ring-gray-800 bg-gray-50" : "hover:shadow-md"
+                          selectedGift?.id === gift.id ? "ring-2 ring-[#696D40] bg-gray-50" : "hover:shadow-md"
                         }`}
                         onClick={() => setSelectedGift(gift)}
                       >
                         <CardContent className="p-3 flex flex-col items-center justify-center h-full text-center">
-                          <img src={gift.image || "/placeholder.svg"} alt={gift.title} className="w-12 h-12 mb-2" />
+                          <img src={gift.image || "/placeholder.svg"} alt={gift.title} className="w-24 h-24 mb-2 object-cover" />
                           <CardTitle className="text-xs font-semibold mb-1">{gift.title}</CardTitle>
-                          {gift.id === 6 ? (
+                          {/* Remove custom gift */}
+                          {gift.id === giftOptions.length + 1 ? (
                             <div className="w-full">
                               <Input
                                 type="number"
@@ -436,7 +452,7 @@ export default function WeddingInvitation() {
 
                   <Button
                     onClick={handleSendGiftMessage}
-                    className="w-full bg-gray-800 hover:bg-gray-900"
+                    className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
                     disabled={!selectedGift || hasSentMessage}
                   >
                     Enviar Presente e Mensagem
@@ -450,7 +466,7 @@ export default function WeddingInvitation() {
           <div className="space-y-2">
             <Button
               onClick={() => setLocationExpanded(!locationExpanded)}
-              className="w-full h-14 text-lg bg-gray-600 hover:bg-gray-700 text-white shadow-lg"
+              className="w-full h-14 text-lg bg-[#696D40] hover:bg-[#A1A08E] text-white shadow-lg"
             >
               <MapPin className="mr-2 h-5 w-5" />
               Ver Localização
@@ -471,7 +487,7 @@ export default function WeddingInvitation() {
                 </div>
 
                 <Button
-                  className="w-full bg-gray-600 hover:bg-gray-700"
+                  className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
                   onClick={() => {
                     const destination = "Bella Flora Casa de Festas. R. Sergipe, 47 - flores, Manaus - AM"
                     window.open(
@@ -480,7 +496,7 @@ export default function WeddingInvitation() {
                     )
                   }}
                 >
-                  <Navigation className="mr-2 h-4 w-4" />
+                  <Navigation className="h-4 w-4" />
                   Leve-me lá
                 </Button>
               </div>
@@ -489,7 +505,7 @@ export default function WeddingInvitation() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-gray-500 text-sm">
+        <div className="text-center mt-8 text-[#696D40] text-sm">
           <Heart className="h-4 w-4 inline mr-1" />
           Com amor, Natália & Matheus
         </div>
@@ -519,7 +535,7 @@ export default function WeddingInvitation() {
                   handleSendGiftMessage()
                 }
               }}
-              className="w-full bg-gray-800 hover:bg-gray-900"
+              className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
             >
               Confirmar e Enviar
             </Button>
