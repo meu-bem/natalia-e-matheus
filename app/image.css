@@ -1,0 +1,17 @@
+.image1 {
+    width: 14rem;
+    position: absolute;
+    transform: rotate(230deg) scaleX(-1) translateY(-30px) translateX(-90px);
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.image2 {
+    width: 14rem;
+    position: absolute;
+    transform: translateY(40px) translateX(90px);
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}

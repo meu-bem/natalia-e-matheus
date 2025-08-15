@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Heart, MapPin, Gift, Users, Navigation } from "lucide-react"
+import { Heart, MapPin, Gift, Users, Navigation, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import {
@@ -19,6 +19,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { PixQRCode } from "./components/pix-qr-code"
+
+import './image.css'
 
 interface GuestResponse {
   name: string
@@ -104,6 +106,7 @@ export default function WeddingInvitation() {
   const [customValue, setCustomValue] = useState("")
   const [giftMessage, setGiftMessage] = useState("")
   const [tempName, setTempName] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   
   // Storage states
   const [hasConfirmed, setHasConfirmed] = useState(false)
@@ -125,6 +128,7 @@ export default function WeddingInvitation() {
   }, [])
 
   const handleConfirmAttendance = async () => {
+    setIsLoading(true)
     if (!guestName.trim() || !attendance) {
       toast({
         title: "Campos obrigatórios",
@@ -184,10 +188,13 @@ export default function WeddingInvitation() {
         description: "Não foi possível salvar sua resposta. Tente novamente.",
         variant: "destructive",
       })
+    } finally{
+      setIsLoading(false)
     }
   }
 
   const handleSendGiftMessage = async () => {
+    setIsLoading(true)
     if (!giftMessage.trim()) {
       toast({
         title: "Mensagem obrigatória",
@@ -210,7 +217,7 @@ export default function WeddingInvitation() {
       name: finalName,
       message: giftMessage,
       giftType: selectedGift?.title || "Presente personalizado",
-      giftValue: selectedGift?.id === 6 ? Number.parseInt(customValue) : selectedGift?.value,
+      giftValue: selectedGift?.value,
       timestamp: new Date().toISOString(),
     }
 
@@ -239,6 +246,8 @@ export default function WeddingInvitation() {
         description: "Não foi possível enviar sua mensagem. Tente novamente.",
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -246,17 +255,18 @@ export default function WeddingInvitation() {
 
   return (
     <div className="min-h-screen bg-[url(/paper-texture.jpg)]">
-      <div className="container mx-auto px-4 py-8 max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="text-6xl font-bold text-gray-800 mb-2 font-serif">N&M</div>
-          <h1 className="text-2xl font-elegant text-gray-700 mb-6">Natália e Matheus</h1>
+      <div className="container mx-auto px-4 py-8 max-w-md min-h-screen relative">
+        {/* <img src="/image1.png" alt="image 1" className="image1" /> */}
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-gray-200">
+        {/* Header */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <img src="/nm.png" alt="N&M" className="w-3/5 mb-8" />
+
+          <div className="w-full bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-gray-200">
             <div className="flex items-center justify-center mb-2">
               <span className="text-lg font-semibold text-[#696D40]">8 de novembro, 2025</span>
             </div>
-            <p className="text-[#696D40] mb-2">às 16:00h</p>
+            <p className="text-[#696D40] mb-2">às 16:30h</p>
             <div className="flex items-center justify-center">
               <MapPin className="h-4 w-4 text-[#696D40] mr-1" />
               <span className="text-sm text-[#696D40]">Bella Flora Casa de Festas</span>
@@ -351,8 +361,13 @@ export default function WeddingInvitation() {
                   )}
                 </div>
 
-                <Button onClick={handleConfirmAttendance} className="w-full bg-[#696D40] hover:bg-[#A1A08E]">
-                  Enviar Confirmação
+                <Button disabled={isLoading} onClick={handleConfirmAttendance} className="w-full bg-[#696D40] hover:bg-[#A1A08E]">
+                  {
+                    isLoading ?
+                      <Loader2 className="animate-spin" />
+                    :
+                      'Enviar Confirmação'
+                  }
                 </Button>
               </div>
             </DrawerContent>
@@ -411,12 +426,12 @@ export default function WeddingInvitation() {
                       <div className="text-center mb-4">
                         <PixQRCode
                           pixKey={pixKey}
-                          value={selectedGift.id === 6 ? Number.parseInt(customValue) || 0 : selectedGift.value}
+                          value={selectedGift.value}
                           description={selectedGift.title}
                           setPixPayload={setPixPayload}
                         />
                         <p className="text-sm text-gray-600 mb-3 mt-2">
-                          Valor: R$ {selectedGift.id === 6 ? customValue || "0" : selectedGift.value}
+                          Valor: R$ {selectedGift.value}
                         </p>
                         <div className="flex items-center justify-between bg-gray-100 p-2 rounded text-sm">
                           <span className="font-mono truncate">{pixPayload}</span>
@@ -453,9 +468,14 @@ export default function WeddingInvitation() {
                   <Button
                     onClick={handleSendGiftMessage}
                     className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
-                    disabled={!selectedGift || hasSentMessage}
+                    disabled={!selectedGift || hasSentMessage || isLoading}
                   >
-                    Enviar Presente e Mensagem
+                    {
+                      isLoading ?
+                        <Loader2 className="animate-spin" />
+                      :
+                        'Enviar Presente e Mensagem'
+                  }
                   </Button>
                 </div>
               </div>
