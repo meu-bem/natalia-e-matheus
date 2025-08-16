@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Heart, MapPin, Gift, Users, Navigation, Loader2 } from "lucide-react"
+import { Heart, MapPin, Gift, Users, Navigation, Loader2, Shirt } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import {
@@ -96,6 +96,7 @@ const giftOptions = [
 export default function WeddingInvitation() {
   const [confirmDrawerOpen, setConfirmDrawerOpen] = useState(false)
   const [giftDrawerOpen, setGiftDrawerOpen] = useState(false)
+  const [dressCodeOpen, setDressCodeOpen] = useState(false)
   const [locationExpanded, setLocationExpanded] = useState(false)
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
@@ -155,7 +156,6 @@ export default function WeddingInvitation() {
         }
       })
       .then(response => response.json())
-      .then(data => console.log("Resposta:", data))
       .catch(error => console.error("Erro:", error));
 
       // Save to localStorage
@@ -222,12 +222,16 @@ export default function WeddingInvitation() {
     }
 
     try {
-      // Send to spreadsheet
-      await fetch("/api/save-gift", {
+      await fetch("https://script.google.com/macros/s/AKfycbx4q1dShxouEMTMNg79GZ4gkeYAqhqX5WgRMMhijzj5GD3TkjCJI4McGKLO0Fql6Bhk8g/exec", {
+        redirect: "follow",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(message),
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        }
       })
+      .then(response => response.json())
+      .catch(error => console.error("Erro:", error));
 
       // Save to localStorage
       localStorage.setItem("wedding_message_sent", "true")
@@ -254,8 +258,8 @@ export default function WeddingInvitation() {
   const pixKey = "nataliamendonsa662@gmail.com"
 
   return (
-    <div className="min-h-screen bg-[url(/paper-texture.jpg)]">
-      <div className="container mx-auto px-4 py-8 max-w-md min-h-screen relative">
+    <div className="min-h-[100dvh] bg-[url(/paper-texture.jpg)]">
+      <div className="container mx-auto px-4 py-8 max-w-md min-h-[100dvh] relative">
         {/* <img src="/image1.png" alt="image 1" className="image1" /> */}
 
         {/* Header */}
@@ -346,7 +350,7 @@ export default function WeddingInvitation() {
                     </button>
                   </div>
 
-                  {attendance && (
+                  {/* {attendance && (
                     <div
                       className={`p-3 rounded-lg text-center ${
                         attendance === "yes"
@@ -358,7 +362,7 @@ export default function WeddingInvitation() {
                         ? "Que alegria! Ficamos muito felizes em saber que você estará conosco!"
                         : "Sentimos muito, mas entendemos perfeitamente. Obrigado por nos avisar!"}
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 <Button disabled={isLoading} onClick={handleConfirmAttendance} className="w-full bg-[#696D40] hover:bg-[#A1A08E]">
@@ -451,6 +455,7 @@ export default function WeddingInvitation() {
                   )}
 
                   <div>
+                    <hr className="mb-4" />
                     <Label htmlFor="message">Mensagem para os noivos</Label>
                     <Textarea
                       id="message"
@@ -474,10 +479,31 @@ export default function WeddingInvitation() {
                       isLoading ?
                         <Loader2 className="animate-spin" />
                       :
-                        'Enviar Presente e Mensagem'
+                        'Enviar Mensagem'
                   }
                   </Button>
                 </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
+
+          {/* Dress Code */}
+          <Drawer open={dressCodeOpen} onOpenChange={setDressCodeOpen}>
+            <DrawerTrigger asChild>
+              <Button
+                className="w-full h-14 text-lg bg-[#696D40] hover:bg-[#A1A08E] text-white shadow-lg"
+              >
+                <Shirt className="mr-2 h-5 w-5" />
+                Dress Code
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Dress Code</DrawerTitle>
+                <DrawerDescription>Dicas pro dia do casamento.</DrawerDescription>
+              </DrawerHeader>
+              <div className="p-4 space-y-6">
+                {/* Add content here */}
               </div>
             </DrawerContent>
           </Drawer>
