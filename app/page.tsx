@@ -93,6 +93,13 @@ const giftOptions = [
   },
 ]
 
+function toManausISOString(date: Date = new Date()): string {
+  return date.toLocaleString("sv-SE", { 
+    timeZone: "America/Manaus", 
+    hour12: false 
+  }).replace(" ", "T") + "Z";
+}
+
 export default function WeddingInvitation() {
   const [confirmDrawerOpen, setConfirmDrawerOpen] = useState(false)
   const [giftDrawerOpen, setGiftDrawerOpen] = useState(false)
@@ -112,6 +119,7 @@ export default function WeddingInvitation() {
   // Storage states
   const [hasConfirmed, setHasConfirmed] = useState(false)
   const [hasSentMessage, setHasSentMessage] = useState(false)
+  const [sentMessageContent, setSentMessageContent] = useState("")
   const [storedGuestName, setStoredGuestName] = useState("")
   
   //Payment
@@ -121,10 +129,12 @@ export default function WeddingInvitation() {
     // Check localStorage on mount
     const confirmed = localStorage.getItem("wedding_confirmed")
     const messageSent = localStorage.getItem("wedding_message_sent")
+    const messageSentContent = localStorage.getItem("wedding_message_sent_content")
     const savedName = localStorage.getItem("wedding_guest_name")
 
     setHasConfirmed(!!confirmed)
     setHasSentMessage(!!messageSent)
+    setSentMessageContent(messageSentContent || "")
     setStoredGuestName(savedName || "")
   }, [])
 
@@ -142,12 +152,12 @@ export default function WeddingInvitation() {
     const response: GuestResponse = {
       name: guestName,
       attendance: attendance as "yes" | "no",
-      timestamp: new Date().toISOString(),
+      timestamp: toManausISOString(),
     }
 
     try {
       // Send to spreadsheet
-      await fetch("https://script.google.com/macros/s/AKfycbweGwCCeIHR1YwuhwLqn-Rw6agKL4O8OZeuuALNq04ecXEBNZ4ySL0g-GdKVbM9OxdI/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbyBj89P7AmqG2u6tJ_ULVFKcPAhRPnK8hCVPtADYssO02_WuDwoprpISKnm6-uOWD0N/exec", {
         redirect: "follow",
         method: "POST",
         body: JSON.stringify(response),
@@ -218,11 +228,11 @@ export default function WeddingInvitation() {
       message: giftMessage,
       giftType: selectedGift?.title || "Presente personalizado",
       giftValue: selectedGift?.value,
-      timestamp: new Date().toISOString(),
+      timestamp: toManausISOString(),
     }
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbx4q1dShxouEMTMNg79GZ4gkeYAqhqX5WgRMMhijzj5GD3TkjCJI4McGKLO0Fql6Bhk8g/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbxN20vECNLmL1M4xC9eFIetb7NsPDljXuFjwN4GFkl34iWeTnosoKMlksoogxp1XH70Cg/exec", {
         redirect: "follow",
         method: "POST",
         body: JSON.stringify(message),
@@ -236,6 +246,8 @@ export default function WeddingInvitation() {
       // Save to localStorage
       localStorage.setItem("wedding_message_sent", "true")
       setHasSentMessage(true)
+      setSentMessageContent(giftMessage)
+      localStorage.setItem("wedding_message_sent_content", giftMessage)
 
       toast({
         title: "Mensagem enviada! 💕",
@@ -350,6 +362,7 @@ export default function WeddingInvitation() {
                     </button>
                   </div>
 
+                  {/* TODO: Fix not enough space when this appear on mobile */}
                   {/* {attendance && (
                     <div
                       className={`p-3 rounded-lg text-center ${
@@ -466,21 +479,27 @@ export default function WeddingInvitation() {
                       disabled={hasSentMessage}
                     />
                     {hasSentMessage && (
+                      <>
                       <p className="text-sm text-gray-500 mt-1">Você já enviou uma mensagem anteriormente.</p>
+                      <b>"{sentMessageContent}"</b>
+                      </>
                     )}
                   </div>
 
                   <Button
                     onClick={handleSendGiftMessage}
                     className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
-                    disabled={!selectedGift || hasSentMessage || isLoading}
+                    disabled={!selectedGift || hasSentMessage || isLoading || giftMessage === ""}
                   >
-                    {
+                    {!selectedGift && "Selecione o presente para enviar!"}
+
+                    {selectedGift && (
                       isLoading ?
                         <Loader2 className="animate-spin" />
                       :
                         'Enviar Mensagem'
-                  }
+                      )
+                    }
                   </Button>
                 </div>
               </div>
@@ -551,9 +570,13 @@ export default function WeddingInvitation() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-[#696D40] text-sm">
+        <div className="text-center mt-8 text-[#696D40] text-base">
           <Heart className="h-4 w-4 inline mr-1" />
-          Com amor, Natália & Matheus
+           Natália & Matheus 
+          <Heart className="h-4 w-4 inline mr-1" />
+        </div>
+        <div className="text-center mt-8 text-xs">
+          Faça seu convite <a className="text-blue-600 hover:text-blue-800 underline underline-offset-2" href="mailto:invito.cd@gmail.com?subject=Solicita%C3%A7%C3%A3o%20de%20Cria%C3%A7%C3%A3o%20de%20Convite%20Personalizado&body=Ol%C3%A1%20time%20da%20Invito%2C%0D%0A%0D%0AEspero%20que%20voc%C3%AA%20esteja%20bem!%0D%0A%0D%0AEstou%20planejando%20%5Btipo%20do%20evento%3A%20ex.%20um%20anivers%C3%A1rio%20especial%2Fum%20casamento%2Fum%20lan%C3%A7amento%5D%20e%20adoraria%20contar%20com%20sua%20expertise%20para%20criar%20um%20convite%20%C3%BAnico.%0D%0A%0D%0AComo%20os%20detalhes%20s%C3%A3o%20importantes%2C%20gostaria%20que%20pudessemos%20agendar%20uma%20conversa%3A%0D%0A%0D%0A-%20O%20tema%20e%20estilo%20visual%20que%20tenho%20em%20mente%3B%0D%0A%0D%0A-%20As%20informa%C3%A7%C3%B5es%20essenciais%20a%20serem%20inclu%C3%ADdas%3B%0D%0A%0D%0AAgrade%C3%A7o%20pela%20aten%C3%A7%C3%A3o%20e%20fico%20no%20aguardo%20do%20seu%20retorno!%0D%0A%0D%0AAtenciosamente%2C%0D%0A%5BSeu%20Nome%5D%0D%0A%5BTelefone%2FCanal%20preferido%20para%20contato%5D">aqui</a>!
         </div>
       </div>
 
