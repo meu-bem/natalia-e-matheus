@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Heart, MapPin, Gift, Users, Navigation, Loader2, Shirt } from "lucide-react"
+import { Heart, MapPin, Gift, Users, Navigation, Loader2, Shirt, Check, MegaphoneOff, Utensils, Camera, LampWallUp, Video, PartyPopper, Clock, Mail, Logs } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import {
@@ -93,10 +93,57 @@ const giftOptions = [
   },
 ]
 
+const guestManual = [
+  {
+    description: 'Confirme sua presença',
+    icon: Check,
+  },
+  {
+    description: 'Deixe seu celular no silencioso',
+    icon: MegaphoneOff,
+  },
+  {
+    description: 'Aguarde a liberação da mesa de doces',
+    icon: Utensils,
+  },
+  {
+    description: 'Tire bastante fotos',
+    icon: Camera,
+  },
+  {
+    description: 'Não leve a decoração para casa',
+    icon: LampWallUp,
+  },
+  {
+    description: 'Não atrapalhe os fotógrafos',
+    icon: Video,
+  },
+  {
+    description: 'Participe da cerimônia',
+    icon: PartyPopper,
+  },
+  {
+    description: 'Seja pontual',
+    icon: Clock,
+  },
+  {
+    description: 'Branco é a cor da noiva e verde das madrinhas',
+    icon: Shirt,
+  },
+  {
+    description: 'Convidado não convida',
+    icon: Mail,
+  },
+  {
+    description: 'Não saia sem se despedir dos noivos',
+    icon: Heart,
+  },
+]
+
 function toManausISOString(date: Date = new Date()): string {
-  return date.toLocaleString("sv-SE", { 
-    timeZone: "America/Manaus", 
-    hour12: false 
+  return date.toLocaleString("sv-SE", {
+    timeZone: "America/Manaus",
+    hour12: false
   }).replace(" ", "T") + "Z";
 }
 
@@ -107,21 +154,25 @@ export default function WeddingInvitation() {
   const [locationExpanded, setLocationExpanded] = useState(false)
   const [nameDialogOpen, setNameDialogOpen] = useState(false)
 
+  const [adultsCount, setAdultsCount] = useState(0);
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [adultsNames, setAdultsNames] = useState<string[]>([]);
+  const [childrenNames, setChildrenNames] = useState<string[]>([]);
+
   // Form states
-  const [guestName, setGuestName] = useState("")
   const [attendance, setAttendance] = useState<"yes" | "no" | "">("")
   const [selectedGift, setSelectedGift] = useState<(typeof giftOptions)[0] | null>(null)
   const [customValue, setCustomValue] = useState("")
   const [giftMessage, setGiftMessage] = useState("")
   const [tempName, setTempName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  
+
   // Storage states
   const [hasConfirmed, setHasConfirmed] = useState(false)
   const [hasSentMessage, setHasSentMessage] = useState(false)
   const [sentMessageContent, setSentMessageContent] = useState("")
   const [storedGuestName, setStoredGuestName] = useState("")
-  
+
   //Payment
   const [pixPayload, setPixPayload] = useState('')
 
@@ -138,9 +189,14 @@ export default function WeddingInvitation() {
     setStoredGuestName(savedName || "")
   }, [])
 
+  useEffect(() => {
+    console.log(adultsNames);
+    console.log(childrenNames);
+  }, [adultsNames, childrenNames])
+
   const handleConfirmAttendance = async () => {
     setIsLoading(true)
-    if (!guestName.trim() || !attendance) {
+    if (!attendance) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha seu nome e confirme sua presença.",
@@ -149,15 +205,20 @@ export default function WeddingInvitation() {
       return
     }
 
+    const guests = JSON.stringify({
+      adults: adultsNames.filter((n) => n.trim() !== ""),
+      children: childrenNames.filter((n) => n.trim() !== ""),
+    });
+
     const response: GuestResponse = {
-      name: guestName,
+      name: guests,
       attendance: attendance as "yes" | "no",
       timestamp: toManausISOString(),
     }
 
     try {
       // Send to spreadsheet
-      await fetch("https://script.google.com/macros/s/AKfycbyBj89P7AmqG2u6tJ_ULVFKcPAhRPnK8hCVPtADYssO02_WuDwoprpISKnm6-uOWD0N/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbzEB8Fow4fh4-O2QgCnivMu2L4k3DGHFQ2I-QjH1l54tjQSRV_I84OWNc7u6_dzl_Pa/exec", {
         redirect: "follow",
         method: "POST",
         body: JSON.stringify(response),
@@ -165,14 +226,14 @@ export default function WeddingInvitation() {
           "Content-Type": "text/plain;charset=utf-8"
         }
       })
-      .then(response => response.json())
-      .catch(error => console.error("Erro:", error));
+        .then(response => response.json())
+        .catch(error => console.error("Erro:", error));
 
       // Save to localStorage
       localStorage.setItem("wedding_confirmed", "true")
-      localStorage.setItem("wedding_guest_name", guestName)
+      localStorage.setItem("wedding_guest_name", guests)
       setHasConfirmed(true)
-      setStoredGuestName(guestName)
+      setStoredGuestName(guests)
 
       if (attendance === "yes") {
         toast({
@@ -198,7 +259,7 @@ export default function WeddingInvitation() {
         description: "Não foi possível salvar sua resposta. Tente novamente.",
         variant: "destructive",
       })
-    } finally{
+    } finally {
       setIsLoading(false)
     }
   }
@@ -220,7 +281,7 @@ export default function WeddingInvitation() {
         setNameDialogOpen(true)
         return
       }
-      finalName = tempName
+      finalName = `{"adults":["${tempName}"],"children":[]}`
     }
 
     const message: GiftMessage = {
@@ -232,7 +293,7 @@ export default function WeddingInvitation() {
     }
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbxN20vECNLmL1M4xC9eFIetb7NsPDljXuFjwN4GFkl34iWeTnosoKMlksoogxp1XH70Cg/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbyZI7BcooPZynELPmk3hMoz1UhrYuIN3EgE3iXVEcWhQg31P5TsuOu8pvY2k3Z8fUULNA/exec", {
         redirect: "follow",
         method: "POST",
         body: JSON.stringify(message),
@@ -240,8 +301,8 @@ export default function WeddingInvitation() {
           "Content-Type": "text/plain;charset=utf-8"
         }
       })
-      .then(response => response.json())
-      .catch(error => console.error("Erro:", error));
+        .then(response => response.json())
+        .catch(error => console.error("Erro:", error));
 
       // Save to localStorage
       localStorage.setItem("wedding_message_sent", "true")
@@ -282,13 +343,13 @@ export default function WeddingInvitation() {
             <div className="flex items-center justify-center mb-2">
               <span className="text-lg font-semibold text-[#696D40]">8 de novembro, 2025</span>
             </div>
-            <p className="text-[#696D40] mb-2">às 16:30h</p>
+            <p className="text-lg text-[#696D40] mb-2">às 16:30h</p>
             <div className="flex items-center justify-center">
               <MapPin className="h-4 w-4 text-[#696D40] mr-1" />
-              <span className="text-sm text-[#696D40]">Bella Flora Casa de Festas</span>
+              <span className="text-[#696D40]">Bella Flora Casa de Festas</span>
             </div>
             <div className="flex items-center justify-center">
-              <span className="text-sm text-[#696D40]">R. Sergipe, 47 - flores, Manaus - AM</span>
+              <span className="text-[#696D40]">R. Sergipe, 47 - flores, Manaus - AM</span>
             </div>
           </div>
         </div>
@@ -311,35 +372,100 @@ export default function WeddingInvitation() {
                 <DrawerTitle>Confirmar Presença</DrawerTitle>
                 <DrawerDescription>Nos ajude a organizar melhor nosso grande dia!</DrawerDescription>
               </DrawerHeader>
-              <div className="p-4 space-y-6">
+
+              <div className="p-4 space-y-6 overflow-auto">
+                {/* Número de adultos */}
                 <div>
-                  <Label htmlFor="name">Nome dos Convidados *</Label>
+                  <Label htmlFor="adultsCount">Quantos adultos irão? *</Label>
                   <Input
-                    id="name"
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    placeholder="Digite seu nome completo"
+                    type="number"
+                    id="adultsCount"
+                    min="0"
+                    value={adultsCount}
+                    onChange={(e) => {
+                      const count = parseInt(e.target.value) || 0;
+                      setAdultsCount(count);
+                      setAdultsNames(Array(count).fill("")); // cria os campos
+                    }}
                     className="mt-1"
                   />
                 </div>
 
+                {/* Campos de nomes dos adultos */}
+                {adultsNames.map((name, index) => (
+                  <div key={`adult-${index}`}>
+                    <Label htmlFor={`adult-${index}`}>Nome do Adulto {index + 1} *</Label>
+                    <Input
+                      id={`adult-${index}`}
+                      value={name}
+                      onChange={(e) => {
+                        const updated = [...adultsNames];
+                        updated[index] = e.target.value;
+                        setAdultsNames(updated);
+                      }}
+                      placeholder="Digite o nome completo"
+                      className="mt-1"
+                    />
+                  </div>
+                ))}
+
+                {/* Número de crianças */}
+                <div>
+                  <Label htmlFor="childrenCount">Quantas crianças irão?</Label>
+                  <Input
+                    type="number"
+                    id="childrenCount"
+                    min="0"
+                    value={childrenCount}
+                    onChange={(e) => {
+                      const count = parseInt(e.target.value) || 0;
+                      setChildrenCount(count);
+                      setChildrenNames(Array(count).fill(""));
+                    }}
+                    className="mt-1"
+                  />
+                </div>
+
+                {/* Campos de nomes das crianças */}
+                {childrenNames.map((name, index) => (
+                  <div key={`child-${index}`}>
+                    <Label htmlFor={`child-${index}`}>Nome da Criança {index + 1}</Label>
+                    <Input
+                      id={`child-${index}`}
+                      value={name}
+                      onChange={(e) => {
+                        const updated = [...childrenNames];
+                        updated[index] = e.target.value;
+                        setChildrenNames(updated);
+                      }}
+                      placeholder="Digite o nome completo"
+                      className="mt-1"
+                    />
+                  </div>
+                ))}
+
+                {/* Botão de presença */}
                 <div className="space-y-4">
                   <Label>Você irá comparecer? *</Label>
-
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setAttendance("no")}
-                      className={`p-4 rounded-lg border-2 transition-all text-center ${
-                        attendance === "no"
+                      className={`p-4 rounded-lg border-2 transition-all text-center ${attendance === "no"
                           ? "bg-[#696D40] border-gray-[#696D40] text-white shadow-md"
                           : "bg-white border-gray-200 hover:border-gray-300"
-                      }`}
+                        }`}
                     >
-                      <div className={`font-semibold mb-1 ${attendance === "no" ? "text-white" : "text-gray-800"}`}>
+                      <div
+                        className={`font-semibold mb-1 ${attendance === "no" ? "text-white" : "text-gray-800"
+                          }`}
+                      >
                         Não poderei ir
                       </div>
-                      <div className={`text-sm ${attendance === "no" ? "text-gray-200" : "text-gray-600"}`}>
+                      <div
+                        className={`text-sm ${attendance === "no" ? "text-gray-200" : "text-gray-600"
+                          }`}
+                      >
                         Infelizmente não conseguirei comparecer
                       </div>
                     </button>
@@ -347,44 +473,39 @@ export default function WeddingInvitation() {
                     <button
                       type="button"
                       onClick={() => setAttendance("yes")}
-                      className={`p-4 rounded-lg border-2 transition-all text-center ${
-                        attendance === "yes"
+                      className={`p-4 rounded-lg border-2 transition-all text-center ${attendance === "yes"
                           ? "bg-[#696D40] border-gray-[#696D40] text-white shadow-md"
                           : "bg-white border-gray-200 hover:border-gray-300"
-                      }`}
+                        }`}
                     >
-                      <div className={`font-semibold mb-1 ${attendance === "yes" ? "text-white" : "text-gray-800"}`}>
+                      <div
+                        className={`font-semibold mb-1 ${attendance === "yes" ? "text-white" : "text-gray-800"
+                          }`}
+                      >
                         Estarei presente
                       </div>
-                      <div className={`text-sm ${attendance === "yes" ? "text-gray-200" : "text-gray-600"}`}>
+                      <div
+                        className={`text-sm ${attendance === "yes" ? "text-gray-200" : "text-gray-600"
+                          }`}
+                      >
                         Confirmo minha presença no casamento
                       </div>
                     </button>
                   </div>
-
-                  {/* TODO: Fix not enough space when this appear on mobile */}
-                  {/* {attendance && (
-                    <div
-                      className={`p-3 rounded-lg text-center ${
-                        attendance === "yes"
-                          ? "bg-green-50 text-green-800 border border-green-200"
-                          : "bg-red-50 text-red-800 border border-red-200"
-                      }`}
-                    >
-                      {attendance === "yes"
-                        ? "Que alegria! Ficamos muito felizes em saber que você estará conosco!"
-                        : "Sentimos muito, mas entendemos perfeitamente. Obrigado por nos avisar!"}
-                    </div>
-                  )} */}
                 </div>
 
-                <Button disabled={isLoading} onClick={handleConfirmAttendance} className="w-full bg-[#696D40] hover:bg-[#A1A08E]">
-                  {
-                    isLoading ?
-                      <Loader2 className="animate-spin" />
-                    :
-                      'Enviar Confirmação'
-                  }
+                {/* Botão de envio */}
+                { (adultsNames.some((name) => name.trim() === "") || childrenNames.some((name) => name.trim() === "")) &&
+                  <p className="text-red-500 text-sm mt-2 text-center">
+                    Por favor, preencha todos os nomes antes de confirmar.
+                  </p>
+                }
+                <Button
+                  disabled={isLoading || adultsNames.some((name) => name.trim() === "") || childrenNames.some((name) => name.trim() === "")}
+                  onClick={handleConfirmAttendance}
+                  className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
+                >
+                  {isLoading ? <Loader2 className="animate-spin" /> : "Enviar Confirmação"}
                 </Button>
               </div>
             </DrawerContent>
@@ -409,14 +530,13 @@ export default function WeddingInvitation() {
                     {giftOptions.map((gift) => (
                       <Card
                         key={gift.id}
-                        className={`cursor-pointer transition-all aspect-square ${
-                          selectedGift?.id === gift.id ? "ring-2 ring-[#696D40] bg-gray-50" : "hover:shadow-md"
-                        }`}
+                        className={`cursor-pointer transition-all aspect-square ${selectedGift?.id === gift.id ? "ring-2 ring-[#696D40] bg-gray-50" : "hover:shadow-md"
+                          }`}
                         onClick={() => setSelectedGift(gift)}
                       >
                         <CardContent className="p-3 flex flex-col items-center justify-center h-full text-center">
                           <img src={gift.image || "/placeholder.svg"} alt={gift.title} className="w-24 h-24 mb-2 object-cover" />
-                          <CardTitle className="text-xs font-semibold mb-1">{gift.title}</CardTitle>
+                          <CardTitle className="text-sm font-semibold mb-1">{gift.title}</CardTitle>
                           {/* Remove custom gift */}
                           {gift.id === giftOptions.length + 1 ? (
                             <div className="w-full">
@@ -480,8 +600,8 @@ export default function WeddingInvitation() {
                     />
                     {hasSentMessage && (
                       <>
-                      <p className="text-sm text-gray-500 mt-1">Você já enviou uma mensagem anteriormente.</p>
-                      <b>"{sentMessageContent}"</b>
+                        <p className="text-sm text-gray-500 mt-1">Você já enviou uma mensagem anteriormente.</p>
+                        <b>"{sentMessageContent}"</b>
                       </>
                     )}
                   </div>
@@ -496,9 +616,9 @@ export default function WeddingInvitation() {
                     {selectedGift && (
                       isLoading ?
                         <Loader2 className="animate-spin" />
-                      :
+                        :
                         'Enviar Mensagem'
-                      )
+                    )
                     }
                   </Button>
                 </div>
@@ -506,23 +626,42 @@ export default function WeddingInvitation() {
             </DrawerContent>
           </Drawer>
 
-          {/* Dress Code */}
+          {/* Manual dos Convidados */}
           <Drawer open={dressCodeOpen} onOpenChange={setDressCodeOpen}>
             <DrawerTrigger asChild>
               <Button
                 className="w-full h-14 text-lg bg-[#696D40] hover:bg-[#A1A08E] text-white shadow-lg"
               >
-                <Shirt className="mr-2 h-5 w-5" />
-                Dress Code
+                <Logs className="mr-2 h-5 w-5" />
+                Manual dos Convidados
               </Button>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
-                <DrawerTitle>Dress Code</DrawerTitle>
-                <DrawerDescription>Dicas pro dia do casamento.</DrawerDescription>
+                <DrawerTitle>Manual dos Convidados</DrawerTitle>
+                <DrawerDescription>Dicas para o dia do casamento</DrawerDescription>
               </DrawerHeader>
-              <div className="p-4 space-y-6">
-                {/* Add content here */}
+              <div className="p-4 space-y-6 overflow-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  {guestManual.map((item, index) => {
+                    const Icon = item.icon
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 p-2"
+                      >
+                        <Icon className="w-6 h-6 flex-shrink-0" />
+                        <span className="text-sm">{item.description}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h3 className="w-full text-center font-bold mb-4">DRESS CODE</h3>
+                  <p className="w-full text-center ">Escolhemos o estilo <b>esporte fino</b> para os nosso convidados.</p>
+                  <p className="w-full text-center ">Queremos que se sinta lindo(a) e elegante.</p>
+                  <p className="w-full text-center "><b>Mulheres:</b> o local tem gramado, então salto fino pode ser desconfortável. Prefira saltos mais grossos, se desejar.</p>
+                </div>
               </div>
             </DrawerContent>
           </Drawer>
@@ -572,7 +711,7 @@ export default function WeddingInvitation() {
         {/* Footer */}
         <div className="text-center mt-8 text-[#696D40] text-base">
           <Heart className="h-4 w-4 inline mr-1" />
-           Natália & Matheus 
+          Natália & Matheus
           <Heart className="h-4 w-4 inline mr-1" />
         </div>
         <div className="text-center mt-8 text-xs">
@@ -593,11 +732,13 @@ export default function WeddingInvitation() {
               <Input
                 id="temp-name"
                 value={tempName}
+                // `{"adults":["${e.target.value}"],"children":[]}`
                 onChange={(e) => setTempName(e.target.value)}
                 placeholder="Digite seu nome"
               />
             </div>
             <Button
+              disabled={!tempName.trim()}
               onClick={() => {
                 if (tempName.trim()) {
                   setNameDialogOpen(false)
