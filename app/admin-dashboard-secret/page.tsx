@@ -153,6 +153,14 @@ export default function AdminDashboard() {
                   ...namesObject.children
                 ].join(", ");
 
+                const date = new Date(response.timestamp);
+                const formattedDate = date.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+                const formattedHour = date.toLocaleTimeString("pt-BR", {
+                  timeZone: "UTC",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
                 return (
                   <div
                     key={index}
@@ -162,11 +170,7 @@ export default function AdminDashboard() {
                       <p className="font-medium">{adults}</p>
                       <p className="font-medium">{children}</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(response.timestamp).toLocaleDateString("pt-BR")} às{" "}
-                        {new Date(response.timestamp).toLocaleTimeString("pt-BR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {formattedDate} às {formattedHour}
                       </p>
                     </div>
                     <Badge
@@ -203,6 +207,14 @@ export default function AdminDashboard() {
                   displayNames = gift.name;
                 }
 
+                const date = new Date(gift.timestamp);
+                const formattedDate = date.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+                const formattedHour = date.toLocaleTimeString("pt-BR", {
+                  timeZone: "UTC",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
                 return (
                   <div key={index} className="p-4 border rounded-lg space-y-2">
                     <div className="flex items-center justify-between">
@@ -213,11 +225,7 @@ export default function AdminDashboard() {
                     <Separator />
                     <p className="text-sm italic">"{gift.message}"</p>
                     <p className="text-xs text-gray-500">
-                      {new Date(gift.timestamp).toLocaleDateString("pt-BR")} às{" "}
-                      {new Date(gift.timestamp).toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {formattedDate} às {formattedHour}
                     </p>
                   </div>
                 );
