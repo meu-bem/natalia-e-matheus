@@ -658,7 +658,7 @@ export default function WeddingInvitation() {
                 </div>
                 <div className="flex flex-col gap-4">
                   <h3 className="w-full text-center font-bold mb-4">DRESS CODE</h3>
-                  <p className="w-full text-center ">Escolhemos o estilo <b>esporte fino</b> para os nosso convidados.</p>
+                  <p className="w-full text-center ">Escolhemos o estilo <b>esporte fino</b> para os nossos convidados.</p>
                   <p className="w-full text-center ">Queremos que se sinta lindo(a) e elegante.</p>
                   <p className="w-full text-center "><b>Mulheres:</b> o local tem gramado, então salto fino pode ser desconfortável. Prefira saltos mais grossos, se desejar.</p>
                 </div>
