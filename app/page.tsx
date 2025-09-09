@@ -495,13 +495,24 @@ export default function WeddingInvitation() {
                 </div>
 
                 {/* Botão de envio */}
-                { (adultsNames.some((name) => name.trim() === "") || childrenNames.some((name) => name.trim() === "")) &&
+                { (
+                  adultsNames.some((name) => name.trim() === "") ||
+                  childrenNames.some((name) => name.trim() === "") ||
+                  childrenNames.length + adultsNames.length === 0 ||
+                  attendance === ""
+                ) &&
                   <p className="text-red-500 text-sm mt-2 text-center">
                     Por favor, preencha todos os nomes antes de confirmar.
                   </p>
                 }
                 <Button
-                  disabled={isLoading || adultsNames.some((name) => name.trim() === "") || childrenNames.some((name) => name.trim() === "")}
+                  disabled={
+                    isLoading ||
+                    adultsNames.some((name) => name.trim() === "") ||
+                    childrenNames.some((name) => name.trim() === "") ||
+                    childrenNames.length + adultsNames.length === 0 ||
+                    attendance === ""
+                  }
                   onClick={handleConfirmAttendance}
                   className="w-full bg-[#696D40] hover:bg-[#A1A08E]"
                 >
